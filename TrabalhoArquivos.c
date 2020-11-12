@@ -24,6 +24,7 @@ void readImage(char *name, int R[MAX][MAX], int G[MAX][MAX], int B[MAX][MAX], in
 			fscanf(f, "%d %d %d", &R[i][j], &G[i][j], &B[i][j]);
 		}
 	}
+
 	fclose(f);
 }
 
@@ -46,13 +47,74 @@ void writeImage(char *arqSaida, int R[MAX][MAX], int G[MAX][MAX], int B[MAX][MAX
 	fclose(f);
 }
 
-void esticarContraste(int R[MAX][MAX], int G[MAX][MAX], int B[MAX][MAX], int novaR[MAX][MAX], int novaG[MAX][MAX], int novaB[MAX][MAX], int cols, int rows){
-	// Insira seu código aqui
+void esticarContraste(char *arqSaida, int R[MAX][MAX], int G[MAX][MAX], int B[MAX][MAX], int novaR[MAX][MAX], int novaG[MAX][MAX], int novaB[MAX][MAX], int cols, int rows){
+	int i, j;
+	int imagem;
+	int maxR = 0, maxG = 0, maxB = 0;
+	int minR = 0, minG = 0, minB = 0;
+	
+	//Calcula o minimo e o maximo e aplica a distorçao
+	for(i=0; i<cols; i++){
+		for(j=0; j<rows; j++){
+			if(maxR < R[i][j])
+				maxR = R[i][j];
+			if(minR > R[i][j])
+				minR = R[i][j];
+			novaR[i][j] = ((R[i][j] - minR)*255)/(maxR - minR);
+			
+			if(maxG < G[i][j])
+				maxG = G[i][j];
+			if(minG > G[i][j])
+				minG = G[i][j];
+			novaG[i][j] = ((G[i][j] - minG)* 255)/(maxG - minG);
+			
+			if(maxB < B[i][j])
+				maxB = B[i][j];
+			if(minB > B[i][j])
+				minB = B[i][j];
+			novaB[i][j] = ((B[i][j] - minB)* 255)/(maxB - minB);
+		}
+	}	
+
+	//Escreve as modificaçoes no arquivo de saida
+	writeImage(arqSaida, novaR, novaG, novaB, cols, rows);
 }
 
-void escalaCinza(int R[MAX][MAX], int G[MAX][MAX], int B[MAX][MAX], int novaR[MAX][MAX], int novaG[MAX][MAX], int novaB[MAX][MAX], int cols, int rows){
-	// Insira seu código aqui
+
+void escalaCinza(char *arqSaida, int R[MAX][MAX], int G[MAX][MAX], int B[MAX][MAX], int novaR[MAX][MAX], int novaG[MAX][MAX], int novaB[MAX][MAX], int cols, int rows){
+	int i, j;
+	int imagem;
+	//ALGORITIMO PARA DEIXAR IMAGEM CINZA
+	for(i=0; i<cols; i++){
+		for(j=0; j<rows; j++){
+			novaR[i][j] = (R[i][j] + G[i][j] + B[i][j])/3;
+			novaG[i][j] = novaR[i][j];
+			novaB[i][j] = novaR[i][j];
+		}
+	}
+	//Escreve as modificaçoes no arquivo de saida
+	writeImage(arqSaida, novaR, novaG, novaB, cols, rows);
+
 }
+
+
+//escolher a função que aplicara o efeito
+void aplicaEfeito(char *arqSaida, char escolha[20], int R[MAX][MAX], int G[MAX][MAX], int B[MAX][MAX], int novaR[MAX][MAX], int novaG[MAX][MAX], int novaB[MAX][MAX], int cols, int rows){
+	if(strcmp (escolha, "Cinza") == 0){
+		escalaCinza(arqSaida, R, G, B, novaR, novaG, novaB, cols, rows);
+	}
+	else if(strcmp (escolha, "Esticar") == 0){
+		esticarContraste(arqSaida, R, G, B, novaR, novaG, novaB, cols, rows);
+	}
+
+  	else{
+		printf("Comando Invalido\n");
+
+	}
+	
+}
+
+
 
 int main(int argc, char **argv) {
   if (argc != 3) {
@@ -69,11 +131,18 @@ int main(int argc, char **argv) {
   char *arqSaida = argv[2];
   int R[MAX][MAX], G[MAX][MAX], B[MAX][MAX], novaR[MAX][MAX], novaG[MAX][MAX], novaB[MAX][MAX];
   int cols, rows;
+ 
 
+  readImage(arqEntrada, R, G, B, &cols, &rows);
+  
+  printf("Digite Cinza ou Esticar: ");
   scanf("%s", efeito);
 
-	// Insira seu código aqui
+  aplicaEfeito(arqSaida, efeito, R, G, B, novaR, novaG, novaB, cols, rows);
 
+  
 
-  return 0;
+  
+
+  return EXIT_SUCCESS;
 }
