@@ -107,11 +107,8 @@ void aplicaEfeito(char *arqSaida, char escolha[20], int R[MAX][MAX], int G[MAX][
 		esticarContraste(arqSaida, R, G, B, novaR, novaG, novaB, cols, rows);
 	}
 
-  	else{
+  	else
 		printf("Comando Invalido\n");
-
-	}
-	
 }
 
 
@@ -126,6 +123,7 @@ int main(int argc, char **argv) {
     fprintf(stderr, "\n");
     return 1;
   }
+
   char efeito[20];
   char *arqEntrada = argv[1];
   char *arqSaida = argv[2];
@@ -139,10 +137,6 @@ int main(int argc, char **argv) {
   scanf("%s", efeito);
 
   aplicaEfeito(arqSaida, efeito, R, G, B, novaR, novaG, novaB, cols, rows);
-
-  
-
-  
 
   return EXIT_SUCCESS;
 }
